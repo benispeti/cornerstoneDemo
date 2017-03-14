@@ -1,9 +1,9 @@
 
 // Load JSON study information for each study
-function loadStudy(studyViewer, viewportModel, studyId) {
-
+function loadStudy(studyViewer, viewportModel, study) {
+    var studyId = study.ID;
     // Get the JSON data for the selected studyId
-    $.getJSON('studies/' + studyId, function(data) {
+    orthanc.getSeriesOfStudy(studyId, function(data) {
 
         var imageViewer = new ImageViewer(studyViewer, viewportModel);
         imageViewer.setLayout('1x1'); // default layout
@@ -53,10 +53,10 @@ function loadStudy(studyViewer, viewportModel, studyId) {
         var seriesIndex = 0;
 
         // Create a stack object for each series
-        data.seriesList.forEach(function(series) {
+        data.forEach(function(series) {
             var stack = {
-                seriesDescription: series.seriesDescription,
-                stackId: series.seriesNumber,
+                seriesDescription: series.MainDicomTags.SeriesDescription,
+                stackId: series.MainDicomTags.SeriesNumber,
                 imageIds: [],
                 seriesIndex: seriesIndex,
                 currentImageIdIndex: 0,
@@ -69,19 +69,17 @@ function loadStudy(studyViewer, viewportModel, studyId) {
             if (series.numberOfFrames !== undefined) {
                 var numberOfFrames = series.numberOfFrames;
                 for (var i = 0; i < numberOfFrames; i++) {
-                    var imageId = series.instanceList[0].imageId + "?frame=" + i;
+                    var imageId = series.Instances[0];
                     if (imageId.substr(0, 4) !== 'http') {
-                        imageId = "dicomweb://cornerstonetech.org/images/ClearCanvas/" + imageId;
+                        imageId = orthanc.getInstanceFileUrl(imageId);
                     }
                     stack.imageIds.push(imageId);
                 }
                 // Otherwise, get each instance url
             } else {
-                series.instanceList.forEach(function(image) {
-                    var imageId = image.imageId;
-
-                    if (image.imageId.substr(0, 4) !== 'http') {
-                        imageId = "dicomweb://cornerstonetech.org/images/ClearCanvas/" + image.imageId;
+                series.Instances.forEach(function(imageId) {
+                    if (imageId.substr(0, 4) !== 'http') {
+                        imageId = orthanc.getInstanceFileUrl(imageId);
                     }
                     stack.imageIds.push(imageId);
                 });
@@ -169,7 +167,7 @@ function loadStudy(studyViewer, viewportModel, studyId) {
             displayThumbnail(seriesList, $(seriesList).find('.list-group-item')[stack], element, imageViewer.stacks[stack], function(el, stack){
                 if (!$(el).data('setup')) {
                     setupViewport(el, stack, this);
-                    setupViewportOverlays(el, data);
+                    setupViewportOverlays(el, study);
                     $(el).data('setup', true);
                 }
             });

@@ -11,17 +11,17 @@ loadTemplate("templates/studyViewer.html", function(element) {
 });
 
 // Get study list from JSON manifest
-$.getJSON('studyList.json', function(data) {
-  data.studyList.forEach(function(study) {
+orthanc.getStudiesOfPatient(QueryString.patient, function(data) {
+  data.forEach(function(study) {
 
     // Create one table row for each study in the manifest
     var studyRow = '<tr><td>' +
-    study.patientName + '</td><td>' +
-    study.patientId + '</td><td>' +
-    study.studyDate + '</td><td>' +
-    study.modality + '</td><td>' +
-    study.studyDescription + '</td><td>' +
-    study.numImages + '</td><td>' +
+    study.PatientMainDicomTags.PatientName + '</td><td>' +
+    study.PatientMainDicomTags.PatientID + '</td><td>' +
+    study.MainDicomTags.StudyDate + '</td><td>' +
+    "TODO" + '</td><td>' +//study.modality + '</td><td>' +
+    study.MainDicomTags.StudyDescription + '</td><td>' +
+    "TODO" + '</td><td>' +//study.numImages + '</td><td>' +
     '</tr>';
 
     // Append the row to the study list
@@ -31,7 +31,7 @@ $.getJSON('studyList.json', function(data) {
     $(studyRowElement).click(function() {
 
       // Add new tab for this study and switch to it
-      var studyTab = '<li><a href="#x' + study.patientId + '" data-toggle="tab">' + study.patientName + '</a></li>';
+      var studyTab = '<li><a href="#x' + study.PatientMainDicomTags.PatientID + '" data-toggle="tab">' + study.PatientMainDicomTags.PatientName + '</a></li>';
       $('#tabs').append(studyTab);
 
       // Add tab content by making a copy of the studyViewerTemplate element
@@ -41,7 +41,7 @@ $.getJSON('studyList.json', function(data) {
       studyViewerCopy.find('.imageViewer').append(viewportCopy);*/
 
 
-      studyViewerCopy.attr("id", 'x' + study.patientId);
+      studyViewerCopy.attr("id", 'x' + study.PatientMainDicomTags.PatientID);
       // Make the viewer visible
       studyViewerCopy.removeClass('hidden');
       // Add section to the tab content
@@ -56,7 +56,7 @@ $.getJSON('studyList.json', function(data) {
       });
 
       // Now load the study.json
-      loadStudy(studyViewerCopy, viewportTemplate, study.studyId + ".json");
+      loadStudy(studyViewerCopy, viewportTemplate, study);
     });
   });
 });

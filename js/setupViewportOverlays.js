@@ -9,10 +9,10 @@ function setupViewportOverlays(element, data) {
     var bottomRight = $(childDivs[3]).find('div');
 
     // Set the overlay text
-    $(topLeft[0]).text(data.patientName);
-    $(topLeft[1]).text(data.patientId);
-    $(topRight[0]).text(data.studyDescription);
-    $(topRight[1]).text(data.studyDate);
+    $(topLeft[0]).text(data.PatientMainDicomTags.PatientName);
+    $(topLeft[1]).text(data.PatientMainDicomTags.PatientID);
+    $(topRight[0]).text(data.MainDicomTags.StudyDescription);
+    $(topRight[1]).text(data.MainDicomTags.StudyDate);
 
 
     // On new image (displayed?)
