@@ -26,7 +26,7 @@ Install
 
 - Clone the repo and switch to it's directory
 
-- Execute **start_cornerstone.sh** to start postgres container.
+- Execute **start_cornerstone.sh** to start cornerstone container.
 ```
 ./start_cornerstone.sh
 ```
