@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# import environment configuration
+. ../env.config
+
 sudo docker build -t=$CORNERSTONE_IMAGE github.com/digitallyseamless/docker-nodejs-bower-grunt
 
 sudo docker run --name $CORNERSTONE_CONTAINER --rm \
