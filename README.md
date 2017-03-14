@@ -17,11 +17,20 @@ Cornerstone modules used:
 **[View a live demo here](http://chafey.github.io/cornerstoneDemo)**
 
 
+Orthanc integration
+-------------------
+This cornerstone demo viewer is integrated with orthanc DICOM server.
+
 Install
-================
+-------
 
 - Clone the repo and switch to it's directory
 
-- Install dependencies via [Bower](http://bower.io/):
-
-> bower install
+- Execute **start_cornerstone.sh** to start postgres container.
+```
+./start_cornerstone.sh
+```
+Note: If cornerstone started successfully you can see something like this
+```
+Server is running on port 9000...
+```
