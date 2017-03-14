@@ -36,6 +36,11 @@ module.exports = function(grunt) {
                 flatten: true
             }
 
+        },
+        serve: {
+            options: {
+                port: 9000
+            }
         }
     });
 
