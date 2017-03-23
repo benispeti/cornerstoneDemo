@@ -11,7 +11,7 @@ loadTemplate("templates/studyViewer.html", function(element) {
 });
 
 // Get study list from JSON manifest
-orthanc.getStudiesOfPatient(QueryString.patient, function(data) {
+orthanc.getStudies(QueryString, function(data) {
   data.forEach(function(study) {
 
     // Create one table row for each study in the manifest
@@ -58,6 +58,9 @@ orthanc.getStudiesOfPatient(QueryString.patient, function(data) {
       // Now load the study.json
       loadStudy(studyViewerCopy, viewportTemplate, study);
     });
+    if (QueryString.study) {
+      $(studyRowElement).click();
+    }
   });
 });
 

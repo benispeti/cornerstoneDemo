@@ -1,9 +1,32 @@
-"use strict";
-
 var orthanc = (function () {
+    "use strict";
     var orthanc = {},
         server = {host: '', port: ''},
-        credentials = {username: '', password: ''};
+        credentials = {username: '', password: ''},
+        getStudy = function (studyId, callback) {
+            var xmlHttp = new XMLHttpRequest(),
+                url = "http://" + server.host + ":" + server.port + "/studies/" + studyId;
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+                    var studies = [];
+                    studies.push(JSON.parse(xmlHttp.responseText));
+                    callback(studies);
+                }
+            };
+            xmlHttp.open("GET", url, true);
+            xmlHttp.send(null);
+        },
+        getStudiesOfPatient = function (patientId, callback) {
+            var xmlHttp = new XMLHttpRequest(),
+                url = "http://" + server.host + ":" + server.port + "/patients/" + patientId + "/studies/";
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+                    callback(JSON.parse(xmlHttp.responseText));
+                }
+            };
+            xmlHttp.open("GET", url, true);
+            xmlHttp.send(null);
+        };
 
     orthanc.setServer = function (host, port) {
         server.host = host;
@@ -16,7 +39,7 @@ var orthanc = (function () {
     //TODO: move to somewhere else and read from config
     orthanc.setServer("localhost", 8042);
     orthanc.setCredentials("orthanc", "orthanc");
-    
+
     orthanc.getCredentialsString = function () {
         return credentials.username + ":" + credentials.password;
     };
@@ -25,18 +48,16 @@ var orthanc = (function () {
         return "dicomweb://" + server.host + ":" + server.port + "/instances/" + instanceId + "/file";
     };
 
-    orthanc.getStudiesOfPatient = function (patientId, callback) {
-        var xmlHttp = new XMLHttpRequest(),
-            url = "http://" + server.host + ":" + server.port + "/patients/" + patientId + "/studies/";
-        xmlHttp.onreadystatechange = function () {
-            if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                callback(JSON.parse(xmlHttp.responseText));
-            }
-        };
-        xmlHttp.open("GET", url, true);
-        xmlHttp.send(null);
+    orthanc.getStudies = function (QueryString, callback) {
+        if (QueryString.patient) {
+            getStudiesOfPatient(QueryString.patient, callback);
+        } else if (QueryString.study) {
+            getStudy(QueryString.study, callback);
+        } else {
+            callback([]);
+        }
     };
-    
+
     orthanc.getSeriesOfStudy = function (studyId, callback) {
         var xmlHttp = new XMLHttpRequest(),
             url = "http://" + server.host + ":" + server.port + "/studies/" + studyId + "/series/";
