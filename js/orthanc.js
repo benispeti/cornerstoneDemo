@@ -36,8 +36,7 @@ var orthanc = (function () {
         credentials.username = user;
         credentials.password = pwd;
     };
-    //TODO: move to somewhere else and read from config
-    orthanc.setServer("localhost", 8042);
+    orthanc.setServer(window.location.hostname, window.location.port);
     orthanc.setCredentials("orthanc", "orthanc");
 
     orthanc.getCredentialsString = function () {
