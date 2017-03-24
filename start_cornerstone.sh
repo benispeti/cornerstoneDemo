@@ -11,4 +11,4 @@ sudo docker run --name $CORNERSTONE_CONTAINER --rm \
     --restart unless-stopped \
     -v $(pwd):/app -w /app \
     $CORNERSTONE_IMAGE \
-    sh -c "npm install; bower install; grunt serve" &
+    sh -c "npm install; bower install; grunt" &
