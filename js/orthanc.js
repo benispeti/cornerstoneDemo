@@ -26,6 +26,19 @@ var orthanc = (function () {
             };
             xmlHttp.open("GET", url, true);
             xmlHttp.send(null);
+        },
+        isInstanceDisplayable = function (instance) {
+            var tags, url = "http://" + server.host + ":" + server.port + "/instances/" + instance + "/content",
+                request = new XMLHttpRequest(),
+                PixelData = '7fe0-0010';
+            request.open('GET', url, false);  // `false` makes the request synchronous
+            request.send(null);
+
+            if (request.status === 200) {
+                tags = JSON.parse(request.responseText);
+                return tags.indexOf(PixelData) >= 0;
+            }
+            return false;
         };
 
     orthanc.setServer = function (host, port) {
@@ -62,7 +75,11 @@ var orthanc = (function () {
             url = "http://" + server.host + ":" + server.port + "/studies/" + studyId + "/series/";
         xmlHttp.onreadystatechange = function () {
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                callback(JSON.parse(xmlHttp.responseText));
+                var i, series = JSON.parse(xmlHttp.responseText);
+                for (i = 0; i < series.length; i = i + 1) {
+                    series[i].Instances = series[i].Instances.filter(isInstanceDisplayable);
+                }
+                callback(series);
             }
         };
         xmlHttp.open("GET", url, true);
