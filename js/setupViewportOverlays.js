@@ -7,6 +7,7 @@ function setupViewportOverlays(element, data) {
     var topRight = $(childDivs[1]).find('div');
     var bottomLeft = $(childDivs[2]).find('div');
     var bottomRight = $(childDivs[3]).find('div');
+    var progressBar = $(childDivs[4]).find('div');
 
     // Set the overlay text
     $(topLeft[0]).text(data.PatientMainDicomTags.PatientName);
@@ -61,4 +62,21 @@ function setupViewportOverlays(element, data) {
     $(element).on("CornerstoneImageRendered", onImageRendered);
 
 
+    // On image load progress
+    function onImageLoadProgress(e, eventData) {
+        // Set image load progress overlay text
+        $(progressBar[0]).text("Loading:" + eventData.percentComplete + " %");
+    }
+    // Add a CornerstoneImageLoadProgress event listener on cornerstone
+    $(cornerstone).on("CornerstoneImageLoadProgress", onImageLoadProgress);
+    
+    
+    // On image loaded
+    function onImageLoaded(e, eventData) {
+        // Set image load progress overlay text
+        $(progressBar[0]).text("");
+    }
+    // Add a CornerstoneImageLoaded event listener on cornerstone
+    $(cornerstone).on("CornerstoneImageLoaded", onImageLoaded);
+    
 }
