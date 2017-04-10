@@ -26,11 +26,11 @@ Install
 
 - Clone the repo and switch to it's directory
 
-- Execute **start_cornerstone.sh** to start cornerstone container.
+- Execute **start_cornerstone.sh** to build cornerstone in a docker container.
 ```
 ./start_cornerstone.sh
 ```
-Note: If cornerstone started successfully you can see something like this
+Note: If cornerstone was built successfully you can see something like this
 ```
-Server is running on port 9000...
+Done, without errors.
 ```
