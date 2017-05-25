@@ -39,6 +39,9 @@ var orthanc = (function () {
                 return tags.indexOf(PixelData) >= 0;
             }
             return false;
+        },
+        isSeriesDisplayable = function (series) {
+            return 0 < series.Instances.length;
         };
 
     orthanc.setServer = function (host, port) {
@@ -79,6 +82,7 @@ var orthanc = (function () {
                 for (i = 0; i < series.length; i = i + 1) {
                     series[i].Instances = series[i].Instances.filter(isInstanceDisplayable);
                 }
+                series = series.filter(isSeriesDisplayable);
                 callback(series);
             }
         };
