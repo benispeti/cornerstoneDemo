@@ -58,9 +58,39 @@ var orthanc = (function () {
     orthanc.getCredentialsString = function () {
         return credentials.username + ":" + credentials.password;
     };
+    
+    orthanc.getFrames = function (instanceId) {
+        var frames, url = "http://" + server.host + ":" + server.port + "/instances/" + instanceId + "/frames",
+            request = new XMLHttpRequest();
+        request.open('GET', url, false);  // `false` makes the request synchronous
+        request.send(null);
+
+        if (request.status === 200) {
+            frames = JSON.parse(request.responseText);
+            return frames;
+        }
+        return [];
+    };
+    
+    orthanc.getInstances = function (seriesId) {
+        var instances, url = "http://" + server.host + ":" + server.port + "/series/" + seriesId + "/instances",
+            request = new XMLHttpRequest();
+        request.open('GET', url, false);  // `false` makes the request synchronous
+        request.send(null);
+
+        if (request.status === 200) {
+            instances = JSON.parse(request.responseText);
+            return instances;
+        }
+        return [];
+    };
 
     orthanc.getInstanceFileUrl = function (instanceId) {
         return "dicomweb://" + server.host + ":" + server.port + "/instances/" + instanceId + "/file";
+    };
+    
+    orthanc.getFrameFileUrl = function (instanceId, frameId) {
+        return "dicomweb://" + server.host + ":" + server.port + "/instances/" + instanceId + "/file?frame=" + frameId;
     };
 
     orthanc.getStudies = function (QueryString, callback) {

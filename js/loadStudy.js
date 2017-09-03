@@ -77,11 +77,23 @@ function loadStudy(studyViewer, viewportModel, study) {
                 }
                 // Otherwise, get each instance url
             } else {
-                series.Instances.forEach(function(imageId) {
-                    if (imageId.substr(0, 4) !== 'http') {
-                        imageId = orthanc.getInstanceFileUrl(imageId);
+                var instances = orthanc.getInstances(series.ID);
+                instances.forEach(function(instance) {
+                    var imageId = instance.ID, frames;
+                    if (instance.MainDicomTags.NumberOfFrames) {
+                        frames = orthanc.getFrames(imageId)
+                        for (var i = 0; i < frames.length; i++) {
+                            stack.imageIds.push( orthanc.getFrameFileUrl(imageId, frames[i]) );
+                        }
+                    } 
+                    else 
+                    {
+                        if (imageId.substr(0, 4) !== 'http') {
+                            stack.imageIds.push( orthanc.getInstanceFileUrl(imageId) );
+                        } else {
+                            stack.imageIds.push(imageId);
+                        }
                     }
-                    stack.imageIds.push(imageId);
                 });
             }
             // Move to next series
