@@ -1,5 +1,7 @@
 function setupViewportOverlays(element, data) {
     var parent = $(element).parent();
+    
+    var progressList = {};
 
     // Get the overlays
     var childDivs = $(parent).find('.overlay');
@@ -64,8 +66,8 @@ function setupViewportOverlays(element, data) {
 
     // On image load progress
     function onImageLoadProgress(e, eventData) {
-        // Set image load progress overlay text
-        $(progressBar[0]).text("Loading:" + eventData.percentComplete + " %");
+        clearTimeout(timeOut);
+        progressList[eventData.imageId]=eventData.percentComplete;
     }
     // Add a CornerstoneImageLoadProgress event listener on cornerstone
     $(cornerstone).on("CornerstoneImageLoadProgress", onImageLoadProgress);
@@ -73,10 +75,27 @@ function setupViewportOverlays(element, data) {
     
     // On image loaded
     function onImageLoaded(e, eventData) {
+        clearTimeout(timeOut);
         // Set image load progress overlay text
-        $(progressBar[0]).text("");
+        var loadedImageList = Object.keys(progressList).reduce(function(p, c) {    
+              if (progressList[c] == 100) p[c] = progressList[c];
+              return p;
+            }, {});
+            imageNumber = Object.keys(progressList).length,
+            loadedImageNumber = Object.keys(loadedImageList).length;
+        // Set image load progress overlay text
+        $(progressBar[0]).text("Loading images: " + imageNumber + "/" + loadedImageNumber);
+        if (imageNumber == loadedImageNumber) {
+            timeOut = setTimeout(hideProgress, 3000);
+        }
     }
     // Add a CornerstoneImageLoaded event listener on cornerstone
     $(cornerstone).on("CornerstoneImageLoaded", onImageLoaded);
+    
+    var timeOut;
+    var hideProgress = function() {
+        $(progressBar[0]).text("");
+        progressList = {};
+    }
     
 }
