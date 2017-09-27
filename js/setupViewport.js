@@ -4,7 +4,7 @@ function setupViewport(element, stack, image) {
 
     // If it's a movie (has frames), then play the clip
     if (stack.frameRate !== undefined) {
-        cornerstone.playClip(element, stack.frameRate);
+        cornerstoneTools.playClip(element, stack.frameRate);
     }
 
     // Activate mouse clicks, mouse wheel and touch

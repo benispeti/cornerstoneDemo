@@ -76,6 +76,7 @@ function setupViewportOverlays(element, data) {
     // On image loaded
     function onImageLoaded(e, eventData) {
         clearTimeout(timeOut);
+        
         // Set image load progress overlay text
         var loadedImageList = Object.keys(progressList).reduce(function(p, c) {    
               if (progressList[c] == 100) p[c] = progressList[c];
@@ -83,10 +84,13 @@ function setupViewportOverlays(element, data) {
             }, {});
             imageNumber = Object.keys(progressList).length,
             loadedImageNumber = Object.keys(loadedImageList).length;
-        // Set image load progress overlay text
-        $(progressBar[0]).text("Loading images: " + imageNumber + "/" + loadedImageNumber);
-        if (imageNumber == loadedImageNumber) {
-            timeOut = setTimeout(hideProgress, 3000);
+        
+        if (imageNumber > 0) {
+            // Set image load progress overlay text
+            $(progressBar[0]).text("Loading images: " + imageNumber + "/" + loadedImageNumber);
+            if (imageNumber == loadedImageNumber) {
+                timeOut = setTimeout(hideProgress, 3000);
+            }
         }
     }
     // Add a CornerstoneImageLoaded event listener on cornerstone
@@ -94,6 +98,9 @@ function setupViewportOverlays(element, data) {
     
     var timeOut;
     var hideProgress = function() {
+        if (timeOut) {
+            timeOut = null;
+        }
         $(progressBar[0]).text("");
         progressList = {};
     }

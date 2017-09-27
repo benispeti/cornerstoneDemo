@@ -66,32 +66,37 @@ function loadStudy(studyViewer, viewportModel, study) {
 
             // Populate imageIds array with the imageIds from each series
             // For series with frame information, get the image url's by requesting each frame
-            if (series.numberOfFrames !== undefined) {
-                var numberOfFrames = series.numberOfFrames;
+            if (series.MainDicomTags.NumberOfFrames !== undefined) {
+                var numberOfFrames = series.MainDicomTags.NumberOfFrames;
                 for (var i = 0; i < numberOfFrames; i++) {
-                    var imageId = series.Instances[0];
-                    if (imageId.substr(0, 4) !== 'http') {
-                        imageId = orthanc.getInstanceFileUrl(imageId);
+                    var instanceId = series.Instances[0];
+                    if (instanceId.substr(0, 4) !== 'http') {
+                        stack.imageIds.push( orthanc.getInstanceFileUrl(instanceId) );
+                    } else {
+                        stack.imageIds.push(instanceId);
                     }
-                    stack.imageIds.push(imageId);
                 }
                 // Otherwise, get each instance url
             } else {
+                // HACK: instances and series.Instances arrays are different, because of multiframe images
                 var instances = orthanc.getInstances(series.ID);
-                instances.forEach(function(instance) {
-                    var imageId = instance.ID, frames;
-                    if (instance.MainDicomTags.NumberOfFrames) {
-                        frames = orthanc.getFrames(imageId)
+                series.Instances.forEach(function(instanceId) {
+                    var instance = instances.find(function (i) {return i.ID == instanceId;}), 
+                        frames, instanceTags;
+                    if (orthanc.isMultiFrameInstance(instance)) {
+                        frames = orthanc.getFrames(instanceId);
                         for (var i = 0; i < frames.length; i++) {
-                            stack.imageIds.push( orthanc.getFrameFileUrl(imageId, frames[i]) );
+                            stack.imageIds.push( orthanc.getFrameFileUrl(instanceId, frames[i]) );
                         }
+                        instanceTags = orthanc.getInstanceTags(instanceId);
+                        stack.frameRate = 1000 / instanceTags.FrameTime;
                     } 
                     else 
                     {
-                        if (imageId.substr(0, 4) !== 'http') {
-                            stack.imageIds.push( orthanc.getInstanceFileUrl(imageId) );
+                        if (instanceId.substr(0, 4) !== 'http') {
+                            stack.imageIds.push( orthanc.getInstanceFileUrl(instanceId) );
                         } else {
-                            stack.imageIds.push(imageId);
+                            stack.imageIds.push(instanceId);
                         }
                     }
                 });

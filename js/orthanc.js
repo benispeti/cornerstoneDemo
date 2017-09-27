@@ -42,6 +42,41 @@ var orthanc = (function () {
         },
         isSeriesDisplayable = function (series) {
             return 0 < series.Instances.length;
+        },
+        getInstance = function (instanceId) {
+            var instance, url = "http://" + server.host + ":" + server.port + "/instances/" + instanceId,
+                request = new XMLHttpRequest();
+            request.open('GET', url, false);  // `false` makes the request synchronous
+            request.send(null);
+
+            if (request.status === 200) {
+                instance = JSON.parse(request.responseText);
+                return instance;
+            }
+            return null;
+        },
+        convertMultiFrameImageToSeries = function(series) {
+            var convertedSeries = [];
+            series.forEach(function(s) {
+                var nonMultiFrameInstances = [];
+                s.Instances.forEach(function(instanceId) {
+                    var instance = getInstance(instanceId);
+                    if (orthanc.isMultiFrameInstance(instance)) {
+                        var newSeries = Object.assign({}, s);
+                        newSeries.Instances = [instanceId];
+//                        newSeries.MainDicomTags.NumberOfFrames = instance.MainDicomTags.NumberOfFrames;
+                        convertedSeries.push(newSeries);
+                    } else {
+                        nonMultiFrameInstances.push(instanceId);
+                    }
+                });
+                if (nonMultiFrameInstances.length > 0) {
+                    var newSeries = Object.assign({}, s);
+                    newSeries.Instances = nonMultiFrameInstances;
+                    convertedSeries.push(newSeries);
+                }
+            });
+            return convertedSeries;
         };
 
     orthanc.setServer = function (host, port) {
@@ -84,6 +119,19 @@ var orthanc = (function () {
         }
         return [];
     };
+    
+    orthanc.getInstanceTags = function (instanceId) {
+        var instance, url = "http://" + server.host + ":" + server.port + "/instances/" + instanceId + "/simplified-tags",
+            request = new XMLHttpRequest();
+        request.open('GET', url, false);  // `false` makes the request synchronous
+        request.send(null);
+
+        if (request.status === 200) {
+            instance = JSON.parse(request.responseText);
+            return instance;
+        }
+        return null;
+    };
 
     orthanc.getInstanceFileUrl = function (instanceId) {
         return "dicomweb://" + server.host + ":" + server.port + "/instances/" + instanceId + "/file";
@@ -113,11 +161,19 @@ var orthanc = (function () {
                     series[i].Instances = series[i].Instances.filter(isInstanceDisplayable);
                 }
                 series = series.filter(isSeriesDisplayable);
+                // HACK: convert multiframe images to new series because Orthanc does not do so
+                series = convertMultiFrameImageToSeries(series);
                 callback(series);
             }
         };
         xmlHttp.open("GET", url, true);
         xmlHttp.send(null);
+    };
+    
+    orthanc.isMultiFrameInstance = function (instance) {
+        return instance && instance.MainDicomTags && 
+            instance.MainDicomTags.NumberOfFrames && 
+            instance.MainDicomTags.NumberOfFrames > 1;
     };
 
     return orthanc;
