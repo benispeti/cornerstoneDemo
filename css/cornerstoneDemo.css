@@ -41,6 +41,10 @@ body {
     color: #e4ad00;
 }
 
+.overlay-right {
+    text-align: right;
+}
+
 .imageViewer {
 }
 

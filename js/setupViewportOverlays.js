@@ -13,9 +13,12 @@ function setupViewportOverlays(element, data) {
 
     // Set the overlay text
     $(topLeft[0]).text(data.PatientMainDicomTags.PatientName);
-    $(topLeft[1]).text(data.PatientMainDicomTags.PatientID);
+    $(topLeft[1]).text(data.PatientMainDicomTags.PatientBirthDate);
+    $(topLeft[2]).text(data.PatientMainDicomTags.PatientID);
     $(topRight[0]).text(data.MainDicomTags.StudyDescription);
-    $(topRight[1]).text(data.MainDicomTags.StudyDate);
+    $(topRight[1]).text(data.MainDicomTags.InstitutionName);
+    $(topRight[2]).text(data.MainDicomTags.StudyDate);
+    $(topRight[3]).text(data.MainDicomTags.StudyTime);
 
 
     // On new image (displayed?)
